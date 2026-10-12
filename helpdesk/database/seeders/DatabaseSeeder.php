@@ -11,13 +11,20 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Demo test account for grading
-        $user = User::factory()->create([
-            'name'              => 'Test User',
-            'email'             => 'test@example.com',
-            'password'          => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
+        // firstOrCreate ensures this is safe to run multiple times
+        $user = User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name'              => 'Test User',
+                'password'          => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Only seed tickets if the user has none
+        if ($user->tickets()->count() > 0) {
+            return;
+        }
 
         $tickets = [
             [
